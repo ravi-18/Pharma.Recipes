@@ -1,6 +1,6 @@
-﻿namespace Pharma.Recipes.Models
+﻿namespace Pharma.Recipes.API.Models
 {
-    public class Step
+    public class Step : BaseModel
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid RecipeId { get; set; }

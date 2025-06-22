@@ -1,11 +1,10 @@
-﻿namespace Pharma.Recipes.Models
+﻿namespace Pharma.Recipes.API.Models
 {
-    public class Recipe
+    public class Recipe : BaseModel
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<Step> Steps { get; set; } = new();
     }

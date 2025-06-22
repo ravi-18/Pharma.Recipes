@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Pharma.Recipes/Pharma.Recipes.csproj", "Pharma.Recipes/"]
-RUN dotnet restore "./Pharma.Recipes/Pharma.Recipes.csproj"
+COPY ["Pharma.Recipes.API/Pharma.Recipes.API.csproj", "Pharma.Recipes.API/"]
+RUN dotnet restore "./Pharma.Recipes.API/Pharma.Recipes.API.csproj"
 COPY . .
-WORKDIR "/src/Pharma.Recipes"
-RUN dotnet build "./Pharma.Recipes.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Pharma.Recipes.API"
+RUN dotnet build "./Pharma.Recipes.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Pharma.Recipes.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Pharma.Recipes.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Pharma.Recipes.dll"]
+ENTRYPOINT ["dotnet", "Pharma.Recipes.API.dll"]
