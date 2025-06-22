@@ -226,5 +226,5 @@ Relasi:
 
 ## 🙌 Author
 
-Developed by: **Ravi Algifari** email: [dinda.ravi.algifari@gmail.com](mailto:dinda.ravi.algifari@gmail.com)
+Developed by: **Dinda Ravi Algifari** email: [dinda.ravi.algifari@gmail.com](mailto:dinda.ravi.algifari@gmail.com)
 Disiapkan untuk keperluan **technical test Back-End Developer**.
