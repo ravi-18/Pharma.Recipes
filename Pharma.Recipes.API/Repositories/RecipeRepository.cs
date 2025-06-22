@@ -17,11 +17,13 @@ namespace Pharma.Recipes.API.Repositories
         public async Task<IEnumerable<RecipeDto>> GetAllRecipesAsync()
         {
             return await _context.Recipes
+                .Include(r => r.Steps)
                 .Select(r => new RecipeDto
                 {
                     Id = r.Id,
                     Name = r.Name,
-                    Description = r.Description
+                    Description = r.Description,
+                    CreatedAt = r.CreatedAt,
                 })
                 .ToListAsync();
         }
@@ -30,9 +32,9 @@ namespace Pharma.Recipes.API.Repositories
         {
             var recipe = await _context.Recipes
                 .Where(r => r.Id == id)
-                .Include(r => r.Steps) // Include steps if needed
                 .Include(r => r.Steps)
-                .ThenInclude(s => s.Parameters) // Include ingredients if needed
+                .ThenInclude(r => r.SubSteps)
+                .ThenInclude(s => s.Parameters)
                 .FirstOrDefaultAsync();
             return recipe;
         }
