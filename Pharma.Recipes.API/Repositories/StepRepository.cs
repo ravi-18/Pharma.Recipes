@@ -10,11 +10,9 @@ namespace Pharma.Recipes.API.Repositories
     public class StepRepository : IStepRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
-        public StepRepository(ApplicationDbContext context, IMapper mapper)
+        public StepRepository(ApplicationDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<bool> StepIsExist(Guid recipeId, Guid id)
@@ -35,7 +33,7 @@ namespace Pharma.Recipes.API.Repositories
             return stepTree;
         }
 
-        public List<StepDto> BuildStepTree(List<Step> allSteps, Guid? parentId = null)
+        public static List<StepDto> BuildStepTree(List<Step> allSteps, Guid? parentId = null)
         {
             return allSteps
                 .Where(s => s.ParentStepId == parentId)
@@ -60,12 +58,39 @@ namespace Pharma.Recipes.API.Repositories
                 .ToList();
         }
 
-        public async Task<Step?> GetStepByIdAsync(Guid recipeId, Guid id)
+        public async Task<StepDetailDto?> GetStepByIdAsync(Guid recipeId, Guid id)
         {
             return await _context.Steps
                 .Include(s => s.Parameters) // Include parameters if needed
                 .Include(s => s.SubSteps) // Include sub-steps if needed
-                .FirstOrDefaultAsync(s => s.Id == id && s.RecipeId == recipeId);
+                .Where(s => s.RecipeId == recipeId && s.Id == id)
+                .Select(s => new StepDetailDto
+                {
+                    Id = s.Id,
+                    Title = s.Title,
+                    RecipeId = s.RecipeId,
+                    ParentStepId = s.ParentStepId,
+                    Sequence = s.Sequence,
+                    Parameters = s.Parameters.Select(p => new StepParameterDto
+                    {
+                        StepId = p.StepId,
+                        Name = p.Name,
+                        DataType = p.DataType,
+                        Value = p.Value,
+                        Description = p.Description
+                    }).ToList(),
+                    SubSteps = BuildStepTree(_context.Steps.ToList(), s.Id), // Get sub-steps recursively
+                    CreatedAt = s.CreatedAt,
+                    CreatedBy = s.CreatedBy,
+                    ModifiedAt = s.ModifiedAt,
+                    ModifiedBy = s.ModifiedBy,
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Step?> GetStepByIdModelAsync(Guid recipeId, Guid id)
+        {
+            return await _context.Steps.FirstOrDefaultAsync(e => e.Id == id && e.RecipeId == recipeId);
         }
 
         public async Task AddStepAsync(Step step)

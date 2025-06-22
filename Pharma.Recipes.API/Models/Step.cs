@@ -12,6 +12,6 @@
         public Recipe Recipe { get; set; } = null!;
         public Step? ParentStep { get; set; }
         public List<Step> SubSteps { get; set; } = new();
-        public List<StepParameter> Parameters { get; set; } = new();
+        public virtual List<StepParameter> Parameters { get; set; } = new();
     }
 }

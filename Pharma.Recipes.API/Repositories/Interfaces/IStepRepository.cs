@@ -7,7 +7,8 @@ namespace Pharma.Recipes.API.Repositories.Interfaces
     {
         Task<bool> StepIsExist(Guid recipeId, Guid id);
         Task<IEnumerable<StepDto>> GetAllStepsAsync(Guid recipeId);
-        Task<Step?> GetStepByIdAsync(Guid recipeId, Guid id);
+        Task<StepDetailDto?> GetStepByIdAsync(Guid recipeId, Guid id);
+        Task<Step?> GetStepByIdModelAsync(Guid recipeId, Guid id);
         Task AddStepAsync(Step step);
         Task UpdateStepAsync(Step step);
         Task DeleteStepAsync(Step step);

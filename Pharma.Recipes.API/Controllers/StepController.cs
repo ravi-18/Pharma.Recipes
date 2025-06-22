@@ -24,7 +24,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // GET: api/Step
-        [HttpGet("api/recipes/{recipeId}/step")]
+        [HttpGet("api/recipe/{recipeId}/step")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Step>>> GetSteps(Guid recipeId)
         {
@@ -32,9 +32,9 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // GET: api/Step/5
-        [HttpGet("api/recipes/{recipeId}/step/{id}")]
+        [HttpGet("api/recipe/{recipeId}/step/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Step>> GetStep(Guid recipeId, Guid id)
+        public async Task<ActionResult<StepDetailDto>> GetStep(Guid recipeId, Guid id)
         {
             if (id == Guid.Empty)
             {
@@ -105,6 +105,7 @@ namespace Pharma.Recipes.API.Controllers
                 var stepEntity = new Step()
                 {
                     Id = stepId,
+                    ParentStepId = step.ParentStepId,
                     RecipeId = step.RecipeId,
                     Title = step.Title,
                     Sequence = step.Sequence,
@@ -122,7 +123,7 @@ namespace Pharma.Recipes.API.Controllers
 
                 await _stepRepository.AddStepAsync(stepEntity);
                 await trx.CommitAsync();
-                return CreatedAtAction("GetStep", new { id = stepEntity.Id }, stepEntity);
+                return CreatedAtAction("GetStep", new { recipeId = stepEntity.RecipeId, id = stepEntity.Id }, stepEntity);
             }
             catch (Exception ex)
             {
@@ -151,7 +152,7 @@ namespace Pharma.Recipes.API.Controllers
             var trx = await _context.Database.BeginTransactionAsync();
             try
             {
-                var step = await _stepRepository.GetStepByIdAsync(recipeId, id);
+                var step = await _stepRepository.GetStepByIdModelAsync(recipeId, id);
                 if (step == null)
                 {
                     return NotFound();

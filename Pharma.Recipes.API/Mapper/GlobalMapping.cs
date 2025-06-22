@@ -8,10 +8,10 @@ namespace Pharma.Recipes.API.Mapper
     {
         public GlobalMapping()
         {
-            //CreateMap<Step, StepCreateDto>();
+            CreateMap<StepDetailDto, Step>();
             CreateMap<StepCreateDto, Step>();
-            //CreateMap<StepParameter, StepParameterCreateDto>();
             CreateMap<StepParameterCreateDto, StepParameter>();
+            CreateMap<StepParameterDto, StepParameter>();
         }
     }
 }
