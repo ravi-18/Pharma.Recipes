@@ -39,5 +39,6 @@ namespace Pharma.Recipes.API.Data
         public DbSet<Recipe> Recipes => Set<Recipe>();
         public DbSet<Step> Steps => Set<Step>();
         public DbSet<StepParameter> StepParameters => Set<StepParameter>();
+        public DbSet<User> Users => Set<User>();
     }
 }

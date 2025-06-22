@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pharma.Recipes.API.Data;
@@ -24,6 +25,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // GET: api/Step
+        [Authorize]
         [HttpGet("api/recipe/{recipeId}/step")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Step>>> GetSteps(Guid recipeId)
@@ -32,6 +34,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // GET: api/Step/5
+        [Authorize]
         [HttpGet("api/recipe/{recipeId}/step/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<StepDetailDto>> GetStep(Guid recipeId, Guid id)
@@ -54,6 +57,7 @@ namespace Pharma.Recipes.API.Controllers
 
         // PUT: api/Step/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("api/recipe/{recipeId}/step/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> PutStep(Guid recipeId, Guid id, Step step)
@@ -66,6 +70,10 @@ namespace Pharma.Recipes.API.Controllers
             var trx = await _context.Database.BeginTransactionAsync();
             try
             {
+                var username = User.Identity?.Name;
+
+                step.ModifiedBy = username;
+
                 await _stepRepository.UpdateStepAsync(step);
                 await trx.CommitAsync();
             }
@@ -88,6 +96,7 @@ namespace Pharma.Recipes.API.Controllers
 
         // POST: api/Step
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost("api/recipe/{recipeId}/step")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<Step>> PostStep(Guid recipeId, StepCreateDto step)
@@ -100,6 +109,7 @@ namespace Pharma.Recipes.API.Controllers
             var trx = await _context.Database.BeginTransactionAsync();
             try
             {
+                var username = User.Identity?.Name;
                 var stepId = Guid.NewGuid();
 
                 var stepEntity = new Step()
@@ -116,9 +126,9 @@ namespace Pharma.Recipes.API.Controllers
                         DataType = e.DataType,
                         Value = e.Value,
                         Description = e.Description,
-                        CreatedBy = "Admin",
+                        CreatedBy = username,
                     }).ToList(),
-                    CreatedBy = "Admin",
+                    CreatedBy = username,
                 };
 
                 await _stepRepository.AddStepAsync(stepEntity);
@@ -134,6 +144,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // DELETE: api/Step/5
+        [Authorize]
         [HttpDelete("api/recipe/{recipeId}/step/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteStep(Guid recipeId, Guid id)

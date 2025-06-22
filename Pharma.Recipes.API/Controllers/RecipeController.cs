@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // GET: api/Recipe
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes()
@@ -35,6 +37,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // GET: api/Recipe/5
+        [Authorize]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Recipe>> GetRecipe(Guid id)
@@ -57,6 +60,7 @@ namespace Pharma.Recipes.API.Controllers
 
         // PUT: api/Recipe/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> PutRecipe(Guid id, RecipeUpdateDto recipe)
@@ -72,6 +76,7 @@ namespace Pharma.Recipes.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            var username = User.Identity?.Name;
             var recipeForUpdate = await _context.Recipes.FindAsync(id);
 
             if (recipeForUpdate == null)
@@ -85,7 +90,7 @@ namespace Pharma.Recipes.API.Controllers
             {
                 recipeForUpdate.Name = recipe.Name;
                 recipeForUpdate.Description = recipe.Description;
-                recipeForUpdate.ModifiedBy = "Admin"; // Assuming you have a way to set the updated by field
+                recipeForUpdate.ModifiedBy = username; // Assuming you have a way to set the updated by field
                 recipeForUpdate.ModifiedAt = DateTime.UtcNow; // Assuming you have a way to set the updated at field
 
                 _context.Entry(recipeForUpdate).State = EntityState.Modified;
@@ -109,6 +114,7 @@ namespace Pharma.Recipes.API.Controllers
 
         // POST: api/Recipe
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<Recipe>> PostRecipe(RecipeCreateDto recipe)
@@ -127,11 +133,13 @@ namespace Pharma.Recipes.API.Controllers
             var trx = await _context.Database.BeginTransactionAsync();
             try
             {
+                var username = User.Identity?.Name;
+                
                 var newRecipe = new Recipe
                 {
                     Name = recipe.Name,
                     Description = recipe.Description,
-                    CreatedBy = "Admin"
+                    CreatedBy = username,
                 };
 
                 _context.Recipes.Add(newRecipe);
@@ -151,6 +159,7 @@ namespace Pharma.Recipes.API.Controllers
         }
 
         // DELETE: api/Recipe/5
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteRecipe(Guid id)
