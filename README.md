@@ -101,7 +101,7 @@ https://localhost:{port}/swagger
 
 > Setelah login, gunakan token untuk akses endpoint lain:
 ```
-Authorization: Bearer {your-token}
+Authorization: {your-token}
 ```
 
 ---
